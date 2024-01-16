@@ -56,10 +56,10 @@ function Home() {
                 text: message,
                 timestamp: Timestamp.now()
             };
-
+            setMessage('');
             const MessageRef=collection(db,"Post");
             const data=await addDoc(MessageRef,newMessage);
-            setMessage('');
+            
         }
     };
 
