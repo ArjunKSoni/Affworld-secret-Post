@@ -31,7 +31,12 @@ export default function Login() {
             if (token) {
                 dispatch(addUser(token.user.displayName))
                 dispatch(addUid(token.user.uid))
-                navigate("/home")
+                if(token.user.email==="aksoni0520@gmail.com" || token.user.email==="ananya88agrawal@gmail.com"){
+                    navigate("/home")
+                }
+                else{
+                    alert("Not Authorised")
+                }
             }
         } catch (error) {
             console.log(error);
