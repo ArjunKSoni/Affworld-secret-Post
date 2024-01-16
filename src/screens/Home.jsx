@@ -58,7 +58,7 @@ function Home() {
             };
             setMessage('');
             const MessageRef=collection(db,"Post");
-            const data=await addDoc(MessageRef,newMessage);
+            await addDoc(MessageRef,newMessage);
             
         }
     };
