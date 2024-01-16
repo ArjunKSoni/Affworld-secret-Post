@@ -1,19 +1,27 @@
-import { IconButton, TextField, Tooltip } from "@mui/material";
+import { TextField, Tooltip } from "@mui/material";
 import React, { useEffect, useRef, useState } from "react";
 import LogoutIcon from '@mui/icons-material/Logout';
 import { useNavigate } from "react-router-dom";
-import { Timestamp, addDoc, collection, getDocs, onSnapshot, orderBy, query } from "firebase/firestore";
+import { Timestamp, addDoc, collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import { db } from "../firebase/firebaseconfig";
+import Cookies from 'js-cookie';
+import { useSelector } from "react-redux";
 
 function Home() {
     const navigate=useNavigate();
     const [message, setMessage] = useState('');
     const [messages, setMessages] = useState([]);
+    const name=useSelector((state)=>state.User.User)
     const messageRef = useRef(null);
 
     const handleInputChange = (e) => {
         setMessage(e.target.value);
     };
+    useEffect(() => {
+      if(!name){
+        navigate("/")
+      }
+    }, [])
 
     useEffect(() => {
         const Messageref=collection(db,"Post");
@@ -44,14 +52,13 @@ function Home() {
                 id: new Date().getTime(),
                 Date: date,
                 Time: time,
-                sender: `Anonymous ${Math.floor(Math.random() * 1000)}`,
+                sender: name.split(" ")[0],
                 text: message,
                 timestamp: Timestamp.now()
             };
 
             const MessageRef=collection(db,"Post");
             const data=await addDoc(MessageRef,newMessage);
-            console.log(data);
             setMessage('');
         }
     };
@@ -60,26 +67,15 @@ function Home() {
         <div className="flex items-center justify-center bg-slate-900 h-screen w-screen">
             <div className="container mx-auto my-8 p-4 h-full bg-gray-100 rounded shadow-md">
                 <div className="flex items-center justify-between">
-                    <h1 className="text-3xl font-bold mb-4">Anonymous Message</h1>
+                    <h1 className="text-3xl font-bold mb-4">{name}</h1>
                     <Tooltip sx={{marginBottom:2}} title="Logout">
                         <div >
-                            <LogoutIcon onClick={()=>navigate("/")} sx={{fontSize:40}} />
+                            <LogoutIcon onClick={()=>{Cookies.remove("Token"); navigate("/")}} sx={{fontSize:40}} />
                         </div>
                     </Tooltip>
                 </div>
-                <div className="mb-4">
-                    <TextField
-                        className="w-full p-2 border rounded"
-                        rows="1"
-                        placeholder="Share your Secrets..."
-                        value={message}
-                        onChange={handleInputChange}
-                        autoFocus={true}
-                        onKeyDown={(key) => { if (key.key === "Enter") handleSendMessage() }}
-                    />
-                    <h1 className="text-slate-400">Press Enter to send message*</h1>
-                </div>
-                <div ref={messageRef} className=" overflow-y-scroll h-3/4">
+                
+                <div ref={messageRef} className=" overflow-y-scroll" style={{height:"80vh"}}>
                     <h2 className="text-xl font-bold mb-2">Messages</h2>
                     <div className='flex h-full flex-col'>
                         {messages.map((msg) => (
@@ -94,6 +90,18 @@ function Home() {
                             </div>
                         ))}
                     </div>
+                </div>
+                <div className="mb-4">
+                    <TextField
+                        className="w-full p-2 border rounded"
+                        rows="1"
+                        placeholder="Share your Secrets..."
+                        value={message}
+                        onChange={handleInputChange}
+                        autoFocus={true}
+                        onKeyDown={(key) => { if (key.key === "Enter") handleSendMessage() }}
+                    />
+                    <h1 className="text-slate-400">Press Enter to send message*</h1>
                 </div>
             </div>
         </div>
