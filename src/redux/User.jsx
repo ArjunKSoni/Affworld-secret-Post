@@ -3,8 +3,8 @@ import {createSlice} from "@reduxjs/toolkit"
 const UserReducer=createSlice({
     name:"User",
     initialState:{
-        User:null,
-        Uid:null
+        User:"",
+        Uid:""
     },
     reducers:{
         addUser:(state,action)=>{
